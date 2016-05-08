@@ -1,6 +1,6 @@
 {
   "turns": 5,
-  "turnLength": 60,
+  "turnLength": 1,
   "movesPerTurn": 5,
   "targets": {
     "countPerPlayer": 1,
@@ -36,11 +36,43 @@
     "penalty": 100
   },
   "moves": {
-    "attack": {"damage": 50},
-    "attack2": {"damage": 2},
-    "attack2X": {"damage": 3, "penalty": 100},
-    "defend": {"damage": 1},
-    "defend2": {"damage": 2},
-    "expose": {"damage": 0.5}
+    "attack": {
+      "name": "hack",
+      "damage": 50,
+      "help": "/ack hack _targetname_ : Direct hack on given target for X damage. Yields credits and possibly a secret, as indicated by target status."
+    },
+    "attack2": {
+      "name": "hsync",
+      "damage": 2,
+      "help": "/ack hsync _targetname_ : Coordinated hack on given target for X damage. Only succeeds if 2 or more people perform this on the same target on the same turn."
+    },
+    "attack2X": {
+      "name": "hsync+",
+      "damage": 3, "penalty": 100,
+      "help": "/ack hsync+ _targetname_ : Coordinated hack on given target for X damage. Only succeeds if 2 or more people perform this on the same target on the same turn. If you attempt this and it does not suceeded, you lose 100 credits."
+    },
+    "defend": {
+      "name": "wall",
+      "damage": 1,
+      "help": "/ack wall _targetname_ : Defense of given target to prevent X damage."
+    },
+    "defend2": {
+      "name": "ssync",
+      "damage": 2,
+      "help": "/ack ssync _targetname_ : Coordinated defense of given target to prevent X damage. Only succeeds if 2 or more people perform this on the same target on the same turn."
+    },
+    "expose": {
+      "name": "expose",
+      "damage": 0.5,
+      "help": "/ack expose _playername_ : Reveal a secret you've collected on given player, causing them to lose X% of their credits. This costs 2 moves."
+    },
+    "transferSecret": {
+      "name": "transfer-secret",
+      "help": "/ack transfer-secret _toplayername_ _secretplayername_ : Transfer a secret you've collected to another player. You will no longer have access to this secret."
+    },
+    "transferCreds": {
+      "name": "transfer-credits",
+      "help": "/ack transfer-credits _toplayername_ _credits_ : Transfer some of your credits to another player."
+    }
   }
 }

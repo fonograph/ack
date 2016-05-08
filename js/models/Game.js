@@ -37,8 +37,9 @@ Game.prototype.findPlayerByName = function(name){
     return _(this.players).find(function(p){ return p.name.toLowerCase() == name.toLowerCase(); });
 };
 
-Game.prototype.randomPlayer = function(exceptId){
-    return _(this.players).reject(['id', exceptId]).sample();
+Game.prototype.randomPlayer = function(exceptIds){
+    exceptIds = exceptIds || [];
+    return _(this.players).reject(function(p){ return _(exceptIds).includes(p.id) }).sample();
 };
 
 module.exports = Game;

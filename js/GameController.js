@@ -24,6 +24,18 @@ GameController.loadOrCreate = function(storage, commandBot, gameBot, teamId, cha
     });
 };
 
+GameController.startTickers = function(storage, gameBot, channelId) {
+    setInterval(function(){
+        storage.teams.all(function(err, teamDatas){
+            teamDatas.forEach(function(teamData){
+                var game = new Game(teamData.id, teamData);
+                var controller = new GameController(game, null, gameBot, channelId, storage);
+                controller.handleTimePassage();
+            });
+        });
+    }, 1000*10);
+};
+
 GameController.prototype.handlePlayerAction = function(playerId, text, message) {
     try {
         if ( text == 'join' ) {
@@ -53,10 +65,19 @@ GameController.prototype.handlePlayerAction = function(playerId, text, message) 
             this._saveGame();
         }
         else if ( text == 'help' ) {
-            //TODO
+            this._help(playerId, message);
         }
-        else if ( text == 'inventory' ) {
-            //TODO
+        else if ( text == 'secrets' ) {
+            this._reportSecrets(playerId, message);
+        }
+        else if ( text == 'bounties' ) {
+            this._reportBounties(playerId, message);
+        }
+        else if ( text == 'moves' ) {
+            this._reportMoves(playerId, message);
+        }
+        else if ( text == 'status' ) {
+            //TODO repeat global status publicly
         }
         else if ( _(Move.names).includes(text[0]) ) {
             this._queueMove(playerId, text, message);
@@ -72,7 +93,17 @@ GameController.prototype.handlePlayerAction = function(playerId, text, message) 
 };
 
 GameController.prototype.handleTimePassage = function() {
-    // TODO
+    if ( this.game.status != Game.statuses.running ) {
+        return;
+    }
+
+    var endTime = new Date();
+    endTime.setTime(this.game.turnStartedTime+Config.turnLength*60*1000);
+
+    if ( Date.now() >= endTime ) {
+        this._endTurn();
+        this._saveGame();
+    }
 };
 
 GameController.prototype._startGame = function() {
@@ -304,6 +335,15 @@ GameController.prototype._endTurn = function(){
 };
 
 GameController.prototype._addPlayer = function(playerId, name, imChannel, message) {
+    if ( this.game.status != Game.statuses.waiting ) {
+        this.commandBot.replyPrivate(message, "You can't join a running game!");
+        return;
+    }
+    if ( this.game.findPlayerById(playerId) ) {
+        this.commandBot.replyPrivate(message, "You've already joined!");
+        return;
+    }
+
     var player = Player.create(playerId, name, imChannel);
     this.game.players.push(player);
 
@@ -347,7 +387,7 @@ GameController.prototype._executeMove = function(playerId, /*Move*/ move, target
             var points = target.currentPointValue;
             player.score += points;
 
-            var secretPlayer = Math.random() < target.currentSecretValue ? this.game.randomPlayer(playerId) : null;
+            var secretPlayer = Math.random() < target.currentSecretValue ? this.game.randomPlayer(player.secrets.concat(playerId)) : null;
             if ( secretPlayer ) {
                 player.secrets.push(secretPlayer.id);
             }
@@ -426,6 +466,7 @@ GameController.prototype._executeMove = function(playerId, /*Move*/ move, target
         case Move.names.transferCreds:
             var targetPlayer = this.game.findPlayerById(move.target);
             var value = move.value;
+            player.score -= value;
             targetPlayer.score += value;
 
             playerReports[player.id].push(sprintf("You transfered %s credits to %s.", value, targetPlayer.name));
@@ -434,6 +475,7 @@ GameController.prototype._executeMove = function(playerId, /*Move*/ move, target
         case Move.names.transferSecret:
             var targetPlayer = this.game.findPlayerById(move.target);
             var secretPlayer = this.game.findPlayerById(move.value);
+            player.secrets = _.without(player.secrets, secretPlayer.id);
             targetPlayer.secrets.push(secretPlayer.id);
 
             playerReports[player.id].push(sprintf("You transfered a secret about %s to %s.", secretPlayer.name, targetPlayer.name));
@@ -449,6 +491,61 @@ GameController.prototype._executeMove = function(playerId, /*Move*/ move, target
             extraReports.push(sprintf("Someone exposed a secret of %s!", targetPlayer.name));
             break;
     }
+};
+
+GameController.prototype._reportSecrets = function(playerId, message) {
+    var player = this.game.findPlayerById(playerId);
+
+    var msg;
+    if ( player.secrets.length ) {
+        msg = "You have secrets for: " + player.secrets.map(function(id){ return this.game.findPlayerById(id).name; }.bind(this)).join(', ');
+    }
+    else {
+        msg = "You have no secrets.";
+    }
+
+    this.commandBot.replyPrivate(message, msg);
+};
+
+GameController.prototype._reportMoves = function(playerId, message) {
+    var player = this.game.findPlayerById(playerId);
+
+    var msg;
+    if ( player.moves.length) {
+        msg = _.map(player.moves, 'originalCommand').join("\n") + "\n";
+
+        var remaining = Config.movesPerTurn - _(player.moves).sumBy('cost');
+        msg += "You have " + remaining + " moves remaining.";
+    }
+    else {
+        msg = "You have not made any moves this turn.";
+    }
+
+    this.commandBot.replyPrivate(message, msg);
+};
+
+GameController.prototype._reportBounties = function(playerId, message) {
+    var player = this.game.findPlayerById(playerId);
+    var msg = "";
+    player.bounties.forEach(function(/*Bounty*/ bounty){
+        var target = this.game.findTargetById(bounty.target);
+        if ( bounty.type == Bounty.types.attack ) {
+            msg += sprintf("- Reduce %s to %s health. DEADLINE: End of turn %s. REWARD: %s credits.\n", target.name, bounty.health, bounty.turn, bounty.value);
+        }
+    }.bind(this));
+    this.commandBot.replyPrivate(message, msg);
+};
+
+GameController.prototype._help = function(playerId, message) {
+    var msg = "";
+    _(Config.moves).forEach(function(info, key){
+        msg += info.help + "\n";
+    });
+    msg += "/ack moves : Display your queued moves for the current turn. These will execute automatically at the end of the turn. \n";
+    msg += "/ack reset : Clear your queued moves for the current turn, allowing you enter new ones. \n";
+    msg += "/ack secrets : List the secrets you've collected. \n";
+    msg += "/ack bounties : List your bounties. \n";
+    this.commandBot.replyPrivate(message, msg);
 };
 
 GameController.prototype._saveGame = function() {

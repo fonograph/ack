@@ -1,3 +1,4 @@
+var _ = require('lodash');
 
 function Player(data) {
     this.id = '';
@@ -17,6 +18,33 @@ Player.create = function(id, name, imChannel) {
     player.imChannel = imChannel;
 
     return player;
+};
+
+Player.availableCredits = function(player) {
+    var Move = require('./Move');
+
+    var s = player.score;
+    player.moves.forEach(function(move){
+        if ( move.type == Move.names.transferCreds ) {
+            s -= move.value;
+        }
+    });
+    return s;
+};
+
+Player.availableSecrets = function(player) {
+    var Move = require('./Move');
+
+    var s = player.secrets;
+    player.moves.forEach(function(move){
+        if ( move.type == Move.names.transferSecret ) {
+            s = _.without(s, move.value);
+        }
+        else if ( move.type == Move.names.expose ) {
+            s = _.without(s, move.target);
+        }
+    });
+    return s;
 };
 
 module.exports = Player;

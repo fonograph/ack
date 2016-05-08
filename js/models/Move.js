@@ -8,6 +8,7 @@ function Move(data) {
     this.value = data.value;
     this.time = data.time || Date.now();
     this.player = data.player; //id
+    this.originalCommand = data.originalCommand; //unprocessed string for reporting
 
     switch ( this.type ) {
         case Move.names.expose:
@@ -42,7 +43,11 @@ Move.combos = [
 ];
 
 Move.fromText = function(text, player, game) {
+    var Player = require('./Player');
     var parts = text;
+
+    var originalCommand = parts.join(' ');
+
     var type = parts[0];
     switch ( type ) {
         case Move.names.attack:
@@ -63,7 +68,8 @@ Move.fromText = function(text, player, game) {
             return new Move({
                 type: type,
                 target: target.id,
-                player: player.id
+                player: player.id,
+                originalCommand: originalCommand
             });
         case Move.names.transferSecret:
         case Move.names.transferCreds:
@@ -79,14 +85,20 @@ Move.fromText = function(text, player, game) {
                 if ( !parseInt(value) ) {
                     throw "Invalid number of credits."
                 }
-                if ( player.score < value ) { //TODO: check this against queued transfers as well
+                if ( player.score < value ) {
                     throw "You don't have enough credits.";
+                }
+                else if ( Player.availableCredits(player) < value ) {
+                    throw "Your existing moves this turn don't leave enough remaining credits for that.";
                 }
             }
             if ( type == Move.names.transferSecret ) {
                 var secretPlayer = game.findPlayerByName(value);
-                if ( !secretPlayer || !_(player.secrets).includes(secretPlayer.id) ) { //TODO: check this against queued transfers as well
+                if ( !secretPlayer || !_(player.secrets).includes(secretPlayer.id) ) {
                     throw "You don't have a secret for that player.";
+                }
+                else if ( !_(Player.availableSecrets(player)).includes(secretPlayer.id) ) {
+                    throw "A previous move this turn is already using that secret.";
                 }
                 value = secretPlayer.id;
             }
@@ -94,20 +106,25 @@ Move.fromText = function(text, player, game) {
                 type: type,
                 target: targetPlayer.id,
                 value: value,
-                player: player.id
+                player: player.id,
+                originalCommand: originalCommand
             });
         case Move.names.expose:
             if ( parts.length < 2 ) {
                 throw "You need to specify what secret to expose.";
             }
             var secretPlayer = game.findPlayerByName(parts[1]);
-            if ( !secretPlayer || !_(player.secrets).includes(secretPlayer.id) ) { //TODO: check this against queued transfers as well
+            if ( !secretPlayer || !_(player.secrets).includes(secretPlayer.id) ) {
                 throw "You don't have a secret for that player.";
+            }
+            else if ( !_(Player.availableSecrets(player)).includes(secretPlayer.id) ) {
+                throw "A previous move this turn is already using that secret.";
             }
             return new Move({
                 type: type,
                 target: secretPlayer.id,
-                player: player.id
+                player: player.id,
+                originalCommand: originalCommand
             });
     }
 };

@@ -25,6 +25,9 @@ stdin.addListener("data", function(d) {
     });
 });
 
+
+// MOCKS
+
 var commandBot = {
     replyPrivate: function(msg, text){
         console.log('');
@@ -67,3 +70,9 @@ var users = {
     2: 'Bob',
     3: 'Charlie'
 };
+
+
+
+
+
+GameController.startTickers(controller.storage, gameBot, 'testChannel');
