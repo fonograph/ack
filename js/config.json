@@ -1,0 +1,46 @@
+{
+  "turns": 5,
+  "turnLength": 60,
+  "movesPerTurn": 5,
+  "targets": {
+    "countPerPlayer": 1,
+    "pointValueMin": 1,
+    "pointValueMax": 10,
+    "secretValueMin": 0.1,
+    "secretValueMax": 0.9,
+    "names": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E",
+      "F",
+      "G",
+      "H",
+      "I",
+      "J",
+      "K",
+      "L",
+      "M",
+      "N",
+      "O",
+      "P"
+    ]
+  },
+  "bounties": {
+    "values": [10, 20, 30, 40, 50],
+    "healths": [90, 80, 70, 60, 50]
+  },
+  "jobs": {
+    "threshold": 10,
+    "penalty": 100
+  },
+  "moves": {
+    "attack": {"damage": 50},
+    "attack2": {"damage": 2},
+    "attack2X": {"damage": 3, "penalty": 100},
+    "defend": {"damage": 1},
+    "defend2": {"damage": 2},
+    "expose": {"damage": 0.5}
+  }
+}
