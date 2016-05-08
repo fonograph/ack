@@ -52,10 +52,11 @@ bot.api.channels.list({}, function (err, response) {
 controller.setupWebserver(process.env.port,function(err,express_webserver) {
     var httpsOptions = {
         key: fs.readFileSync( 'ssl/privatekey.key' ),
-        cert: fs.readFileSync( 'ssl/certificate.ca-bundle' )
+        cert: fs.readFileSync( 'ssl/certificate.crt' )
     };
-    https.createServer(express_webserver).listen(process.env.port+1);
-    controller.createWebhookEndpoints(express_webserver)
+    https.createServer(httpsOptions, express_webserver).listen(process.env.port+1, function(){
+        controller.createWebhookEndpoints(express_webserver)
+    });
 });
 
 
