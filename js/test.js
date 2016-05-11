@@ -71,8 +71,11 @@ var users = {
     3: 'Charlie'
 };
 
+var bots = {
+    testTeam: gameBot
+};
 
 
 
 
-GameController.startTickers(controller.storage, gameBot, 'testChannel');
+GameController.startTickers(controller.storage, bots, 'testChannel');

@@ -8,7 +8,8 @@ var Config = require('./config.json');
 var sprintf = require('sprintf-js').sprintf;
 
 
-function GameController(/*Game*/ game, commandBot, gameBot, channelId, storage) {
+function GameController(teamData, /*Game*/ game, commandBot, gameBot, channelId, storage) {
+    this.teamData = teamData;
     this.game = game;
     this.gameBot = gameBot;
     this.commandBot = commandBot;
@@ -18,19 +19,26 @@ function GameController(/*Game*/ game, commandBot, gameBot, channelId, storage) 
 
 GameController.loadOrCreate = function(storage, commandBot, gameBot, teamId, channelId, callback) {
     storage.teams.get(teamId, function(err, teamData){
-        var game = new Game(teamId, teamData);
-        var controller = new GameController(game, commandBot, gameBot, channelId, storage);
+        teamData = teamData || {id: teamId};
+        var game = new Game(teamId, teamData.game);
+        var controller = new GameController(teamData, game, commandBot, gameBot, channelId, storage);
         callback(controller);
     });
 };
 
-GameController.startTickers = function(storage, gameBot, channelId) {
+GameController.startTickers = function(storage, bots, channelId) {
     setInterval(function(){
         storage.teams.all(function(err, teamDatas){
             teamDatas.forEach(function(teamData){
-                var game = new Game(teamData.id, teamData);
-                var controller = new GameController(game, null, gameBot, channelId, storage);
-                controller.handleTimePassage();
+                var game = new Game(teamData.id, teamData.game);
+                var bot = bots[teamData.id];
+                try {
+                    var controller = new GameController(teamData, game, null, bot, channelId, storage);
+                    controller.handleTimePassage();
+                }
+                catch (e) {
+                    console.error('Error in ticker', teamData.id, e);
+                }
             });
         });
     }, 1000*10);
@@ -549,7 +557,8 @@ GameController.prototype._help = function(playerId, message) {
 };
 
 GameController.prototype._saveGame = function() {
-    this.storage.teams.save(this.game);
+    this.teamData.game = this.game;
+    this.storage.teams.save(this.teamData);
 };
 
 
