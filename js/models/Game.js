@@ -4,6 +4,7 @@ function Game(teamId, teamData) {
     teamData = teamData || {};
 
     this.id = teamId;
+    this.channelId = teamData.channelId;
     this.players = teamData.players || [];
     this.targets = teamData.targets || [];
     this.status = teamData.status || Game.statuses.waiting;

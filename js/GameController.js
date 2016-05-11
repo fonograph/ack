@@ -8,7 +8,7 @@ var Config = require('./config.json');
 var sprintf = require('sprintf-js').sprintf;
 
 
-function GameController(teamData, /*Game*/ game, commandBot, gameBot, channelId, storage) {
+function GameController(teamData, /*Game*/ game, commandBot, gameBot, storage) {
     this.teamData = teamData;
     this.game = game;
     this.gameBot = gameBot;
@@ -17,23 +17,38 @@ function GameController(teamData, /*Game*/ game, commandBot, gameBot, channelId,
     this.storage = storage;
 }
 
-GameController.loadOrCreate = function(storage, commandBot, gameBot, teamId, channelId, callback) {
+GameController.loadOrCreate = function(storage, commandBot, gameBot, teamId, callback) {
     storage.teams.get(teamId, function(err, teamData){
         teamData = teamData || {id: teamId};
+
         var game = new Game(teamId, teamData.game);
-        var controller = new GameController(teamData, game, commandBot, gameBot, channelId, storage);
-        callback(controller);
+        var controller = new GameController(teamData, game, commandBot, gameBot, storage);
+
+        if ( !game.channelId ) {
+            gameBot.api.channels.list({}, function (err, response) {
+                for (var i = 0; i < response.channels.length; i++) {
+                    var channel = response.channels[i];
+                    if ( channel.name == 'ack' ) {
+                        game.channelId = channel.id;
+                        callback(controller);
+                    }
+                }
+            });
+        }
+        else {
+            callback(controller);
+        }
     });
 };
 
-GameController.startTickers = function(storage, bots, channelId) {
+GameController.startTickers = function(storage, bots) {
     setInterval(function(){
         storage.teams.all(function(err, teamDatas){
             teamDatas.forEach(function(teamData){
                 var game = new Game(teamData.id, teamData.game);
                 var bot = bots[teamData.id];
                 try {
-                    var controller = new GameController(teamData, game, null, bot, channelId, storage);
+                    var controller = new GameController(teamData, game, null, bot, storage);
                     controller.handleTimePassage();
                 }
                 catch (e) {
@@ -63,6 +78,7 @@ GameController.prototype.handlePlayerAction = function(playerId, text, message) 
         else if ( text == 'killit' ) {
             this._endGame();
             this._saveGame();
+            this.commandBot.replyPrivate(message, 'Forced end of game');
         }
         else if ( text == 'forceit' ) {
             this._endTurn();

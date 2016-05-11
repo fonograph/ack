@@ -62,7 +62,7 @@ controller.on('create_bot',function(bot,config) {
 
 controller.on('slash_command',function(commandBot,message) {
     var gameBot = bots[commandBot.team_info.id];
-    GameController.loadOrCreate(controller.storage, commandBot, gameBot, message.team_id, '#ack', function(gameController){
+    GameController.loadOrCreate(controller.storage, commandBot, gameBot, message.team_id, function(gameController){
 
         var text = message.text.trim().toLowerCase().split(/ +/);
 
@@ -94,18 +94,8 @@ controller.storage.teams.all(function(err,teams) {
 
 });
 
-GameController.startTickers(controller.storage, bots, '#ack');
+GameController.startTickers(controller.storage, bots);
 
 
 
 
-//
-//var channelId;
-//bot.api.channels.list({}, function (err, response) {
-//    for (var i = 0; i < response.channels.length; i++) {
-//        var channel = response.channels[i];
-//        if ( channel.name == 'ack' ) {
-//            channelId = channel.id;
-//        }
-//    }
-//});
