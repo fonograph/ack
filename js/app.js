@@ -27,7 +27,7 @@ controller.configureSlackApp({
     clientId: process.env.clientId,
     clientSecret: process.env.clientSecret,
     redirectUri: 'https://themission.biz:' + process.env.httpsPort,
-    scopes: ['team:read','users:read','channels:read','im:open','im:write','chat:write:bot','bot']
+    scopes: ['channels:write','channels:read','chat:write:bot','im:write','im:read','team:read','users:read','commands','bot']
 });
 
 controller.setupWebserver(process.env.httpPort,function(err,express_webserver) {
