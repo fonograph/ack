@@ -565,10 +565,10 @@ GameController.prototype._help = function(playerId, message) {
     _(Config.moves).forEach(function(info, key){
         msg += info.help + "\n";
     });
-    msg += "/ack moves : Display your queued moves for the current turn. These will execute automatically at the end of the turn. \n";
-    msg += "/ack reset : Clear your queued moves for the current turn, allowing you enter new ones. \n";
-    msg += "/ack secrets : List the secrets you've collected. \n";
-    msg += "/ack bounties : List your bounties. \n";
+    msg += "*/ack moves* : Display your queued moves for the current turn. These will execute automatically at the end of the turn. \n";
+    msg += "*/ack reset* : Clear your queued moves for the current turn, allowing you enter new ones. \n";
+    msg += "*/ack secrets* : List the secrets you've collected. \n";
+    msg += "*/ack bounties* : List your bounties. \n";
     this.commandBot.replyPrivate(message, msg);
 };
 
