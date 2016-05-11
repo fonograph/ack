@@ -49,7 +49,7 @@ controller.setupWebserver(process.env.httpPort,function(err,express_webserver) {
 });
 
 controller.on('create_bot',function(bot,config) {
-    if (bots[bot.team_info.id]) {
+    if (bots[bot.config.id]) {
         // already online! do nothing.
     } else {
         bot.startRTM(function(err) {
