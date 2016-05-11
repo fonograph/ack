@@ -13,7 +13,7 @@ function GameController(teamData, /*Game*/ game, commandBot, gameBot, storage) {
     this.game = game;
     this.gameBot = gameBot;
     this.commandBot = commandBot;
-    this.channelId = channelId;
+    this.channelId = game.channelId;
     this.storage = storage;
 }
 
