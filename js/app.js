@@ -61,7 +61,7 @@ controller.on('create_bot',function(bot,config) {
 });
 
 controller.on('slash_command',function(commandBot,message) {
-    var gameBot = bots[bot.config.id];
+    var gameBot = bots[commandBot.team_info.id];
     GameController.loadOrCreate(controller.storage, commandBot, gameBot, message.team_id, '#ack', function(gameController){
 
         var text = message.text.trim().toLowerCase().split(/ +/);
