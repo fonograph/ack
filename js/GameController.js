@@ -185,7 +185,7 @@ GameController.prototype._startGame = function() {
         player.bounties.forEach(function(/*Bounty*/ bounty){
             var target = this.game.findTargetById(bounty.target);
             if ( bounty.type == Bounty.types.attack ) {
-                msg += sprintf("- Reduce %s to %s health. DEADLINE: End of turn %s. REWARD: %s credits.\n", target.name, bounty.health, bounty.turn, bounty.value);
+                msg += sprintf("- Reduce %s to %s health. DEADLINE: End of turn %s. REWARD: %s credits.\n", target.name, bounty.health, bounty.turn+1, bounty.value);
             }
         }.bind(this));
         this.gameBot.say({channel:player.imChannel, text:msg});
@@ -214,14 +214,14 @@ GameController.prototype._startTurn = function() {
     this.game.targets.forEach(function(target){
         var pointValueWeight = Math.random();
         var secretValueWeight = 1 - pointValueWeight;
-        target.currentPointValue = (Config.targets.pointValueMax-Config.targets.pointValueMin) * pointValueWeight + Config.targets.pointValueMin;
-        target.currentSecretValue = (Config.targets.secretValueMax-Config.targets.secretValueMin) * secretValueWeight + Config.targets.secretValueMin;
+        target.currentPointValue = Math.round((Config.targets.pointValueMax-Config.targets.pointValueMin) * pointValueWeight + Config.targets.pointValueMin);
+        target.currentSecretValue = Math.round( 100 * ((Config.targets.secretValueMax-Config.targets.secretValueMin) * secretValueWeight + Config.targets.secretValueMin)) / 100;
     });
 
     // announce
     var endTime = new Date();
     endTime.setTime(this.game.turnStartedTime+Config.turnLength*60*1000);
-    var msg = sprintf("Turn %s has started. This turn will end at %s.", this.game.turn, endTime.toTimeString());
+    var msg = sprintf("Turn %s has started. This turn will end at %s.", this.game.turn+1, endTime.toTimeString());
     this.gameBot.say({channel:this.channelId, text:msg});
 
     // target info
@@ -321,6 +321,9 @@ GameController.prototype._endTurn = function(){
     });
 
     // output reports
+
+    var msg = sprintf("TURN %s IS OVER\n\n", this.game.turn+1);
+    this.gameBot.say({channel:this.channelId, text:msg});
 
     _(targetReports).forEach(function(report, targetId){
         var target = this.game.findTargetById(targetId);
@@ -507,7 +510,7 @@ GameController.prototype._executeMove = function(playerId, /*Move*/ move, target
             break;
         case Move.names.expose:
             var targetPlayer = this.game.findPlayerById(move.target);
-            var damage = targetPlayer.score * Config.moves.expose.damage;
+            var damage = Math.round(targetPlayer.score * Config.moves.expose.damage);
             targetPlayer.score -= damage;
             player.secrets = _.without(player.secrets, targetPlayer.id);
 

@@ -12,7 +12,7 @@ var stdin = process.openStdin();
 stdin.addListener("data", function(d) {
     var text = d.toString().trim();
 
-    GameController.loadOrCreate(controller.storage, commandBot, gameBot, 'testTeam', 'testChannel', function(gameController){
+    GameController.loadOrCreate(controller.storage, commandBot, gameBot, 'testTeam', function(gameController){
 
         text = d.toString().trim().toLowerCase().split(/ +/);
         var userId = text.shift();
@@ -61,6 +61,15 @@ var gameBot = {
                     }
                 })
             }
+        },
+        channels: {
+            list: function(data, callback){
+                callback(null, {
+                    channels: [
+                        {name: 'ack', id: 'testChannel'}
+                    ]
+                })
+            }
         }
     }
 };
@@ -78,4 +87,4 @@ var bots = {
 
 
 
-GameController.startTickers(controller.storage, bots, 'testChannel');
+GameController.startTickers(controller.storage, bots);
