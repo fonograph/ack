@@ -2,12 +2,13 @@
   "turns": 5,
   "turnLength": 1,
   "movesPerTurn": 5,
+  "startingPoints": 30,
   "targets": {
-    "countPerPlayer": 1,
-    "pointValueMin": 1,
+    "countPerPlayer": 1.5,
+    "pointValueMin": 0,
     "pointValueMax": 10,
-    "secretValueMin": 0.1,
-    "secretValueMax": 0.9,
+    "secretValueMin": 0,
+    "secretValueMax": 0.3,
     "names": [
       "A",
       "B",
@@ -28,43 +29,43 @@
     ]
   },
   "bounties": {
-    "values": [10, 20, 30, 40, 50],
-    "healths": [90, 80, 70, 60, 50]
+    "values": [20, 30, 40, 50, 60],
+    "healths": [90, 85, 80, 75, 70]
   },
   "jobs": {
-    "threshold": 10,
-    "penalty": 100
+    "threshold": 15,
+    "penalty": 0.25
   },
   "moves": {
     "attack": {
       "name": "hack",
-      "damage": 50,
+      "damage": 5,
       "help": "*/ack hack _targetname_* : Direct hack on given target for X damage. Yields credits and possibly a secret, as indicated by target status."
     },
     "attack2": {
       "name": "hsync",
-      "damage": 2,
+      "damage": 10,
       "help": "*/ack hsync _targetname_* : Coordinated hack on given target for X damage. Only succeeds if 2 or more people perform this on the same target on the same turn."
     },
     "attack2X": {
       "name": "hsync+",
-      "damage": 3, "penalty": 100,
-      "help": "*/ack hsync+ _targetname_* : Coordinated hack on given target for X damage. Only succeeds if 2 or more people perform this on the same target on the same turn. If you attempt this and it does not suceeded, you lose 100 credits."
+      "damage": 15, "penalty": 20,
+      "help": "*/ack hsync+ _targetname_* : Coordinated hack on given target for X damage. Only succeeds if 2 or more people perform this on the same target on the same turn. If you attempt this and it does not suceeded, you lose 20 credits."
     },
     "defend": {
       "name": "wall",
-      "damage": 1,
+      "damage": 5,
       "help": "*/ack wall _targetname_* : Defense of given target to prevent X damage."
     },
     "defend2": {
       "name": "ssync",
-      "damage": 2,
+      "damage": 10,
       "help": "*/ack ssync _targetname_* : Coordinated defense of given target to prevent X damage. Only succeeds if 2 or more people perform this on the same target on the same turn."
     },
     "expose": {
       "name": "expose",
       "damage": 0.5,
-      "help": "*/ack expose _playername_* : Reveal a secret you've collected on given player, causing them to lose X% of their credits. This costs 2 moves."
+      "help": "*/ack expose _playername_* : Reveal a secret you've collected on given player, causing them to lose 50% of their credits. This costs 2 moves."
     },
     "transferSecret": {
       "name": "transfer-secret",

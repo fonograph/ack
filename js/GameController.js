@@ -140,7 +140,7 @@ GameController.prototype._startGame = function() {
     this.game.status = Game.statuses.running;
 
     // create targets
-    var targetCount = this.game.players.length * Config.targets.countPerPlayer;
+    var targetCount = Math.round(this.game.players.length * Config.targets.countPerPlayer);
     for ( var i=0; i<targetCount; i++ ) {
         var target = Target.create(i.toString(), Config.targets.names[i]);
         this.game.targets.push(target);
@@ -310,8 +310,9 @@ GameController.prototype._endTurn = function(){
         var jobTarget = this.game.findTargetById(player.jobs[this.game.turn]);
         var jobDamage = targetStates[jobTarget.id].damage - targetStates[jobTarget.id].heal;
         if ( jobDamage > Config.jobs.threshold ) {
-            player.score -= Config.jobs.penalty;
-            playerReports[player.id].push(sprintf("Your assigned job, %s, took %s damage this turn. You failed at your job and lost %s credits.", jobTarget.name, jobDamage, Config.jobs.penalty));
+            var damage = Math.round(player.score * Config.jobs.penalty);
+            player.score -= damage;
+            playerReports[player.id].push(sprintf("Your assigned job, %s, took %s damage this turn. You failed at your job and lost %s credits.", jobTarget.name, jobDamage, damage));
         }
     }.bind(this));
 

@@ -1,4 +1,5 @@
 var _ = require('lodash');
+var Config = require('../config.json');
 
 function Player(data) {
     this.id = '';
@@ -16,6 +17,7 @@ Player.create = function(id, name, imChannel) {
     player.id = id;
     player.name = name;
     player.imChannel = imChannel;
+    player.score = Config.startingPoints;
 
     return player;
 };
