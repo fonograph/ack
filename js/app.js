@@ -19,7 +19,7 @@ function trackBot(bot) {
 }
 
 var controller = Botkit.slackbot({
-    debug: process.env.debug,
+    debug: process.env.debug === 'true',
     json_file_store: 'storage/db.json'
 });
 
