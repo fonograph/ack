@@ -40,27 +40,27 @@
     "attack": {
       "name": "hack",
       "damage": 5,
-      "help": "*/ack hack _targetname_* : Direct hack on given target for X damage. Yields credits and possibly a secret, as indicated by target status."
+      "help": "*/ack hack _targetname_* : Direct hack on given target for 5 damage. Yields credits and possibly a secret, as indicated by target status."
     },
     "attack2": {
       "name": "hsync",
       "damage": 10,
-      "help": "*/ack hsync _targetname_* : Coordinated hack on given target for X damage. Only succeeds if 2 or more people perform this on the same target on the same turn."
+      "help": "*/ack hsync _targetname_* : Coordinated hack on given target for 10 damage. Only succeeds if 2 or more people perform this on the same target on the same turn."
     },
     "attack2X": {
       "name": "hsync+",
       "damage": 15, "penalty": 20,
-      "help": "*/ack hsync+ _targetname_* : Coordinated hack on given target for X damage. Only succeeds if 2 or more people perform this on the same target on the same turn. If you attempt this and it does not suceeded, you lose 20 credits."
+      "help": "*/ack hsync+ _targetname_* : Coordinated hack on given target for 15 damage. Only succeeds if 2 or more people perform this on the same target on the same turn. If you attempt this and it does not suceeded, you lose 20 credits."
     },
     "defend": {
       "name": "wall",
       "damage": 5,
-      "help": "*/ack wall _targetname_* : Defense of given target to prevent X damage."
+      "help": "*/ack wall _targetname_* : Defense of given target to prevent 5 damage."
     },
     "defend2": {
       "name": "ssync",
       "damage": 10,
-      "help": "*/ack ssync _targetname_* : Coordinated defense of given target to prevent X damage. Only succeeds if 2 or more people perform this on the same target on the same turn."
+      "help": "*/ack ssync _targetname_* : Coordinated defense of given target to prevent 10 damage. Only succeeds if 2 or more people perform this on the same target on the same turn."
     },
     "expose": {
       "name": "expose",
