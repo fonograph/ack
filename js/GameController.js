@@ -344,11 +344,14 @@ GameController.prototype._endTurn = function(){
     var msg = sprintf("TURN %s IS OVER\n\n", this.game.turn+1);
     this.gameBot.say({channel:this.channelId, text:msg});
 
+    var formattedTargetReports = [];
     _(targetReports).forEach(function(report, targetId){
         var target = this.game.findTargetById(targetId);
         var msg = sprintf("ACTIVITY ON %s: \n", target.name) + report.join("\n") + "\n";
-        this.gameBot.say({channel:this.channelId, text:msg});
+        formattedTargetReports.push(msg);
     }.bind(this));
+    var msg = formattedTargetReports.join("\n");
+    this.gameBot.say({channel:this.channelId, text:msg});
 
     _(playerReports).forEach(function(report, playerId){
         var player = this.game.findPlayerById(playerId);
