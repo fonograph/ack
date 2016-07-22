@@ -82,7 +82,8 @@ Move.fromText = function(text, player, game) {
             }
             var value = parts[2];
             if ( type == Move.names.transferCreds ) {
-                if ( !parseInt(value) ) {
+                value = parseInt(value);
+                if ( !value ) {
                     throw "Invalid number of credits."
                 }
                 if ( player.score < value ) {

@@ -121,8 +121,16 @@ GameController.prototype.handleTimePassage = function() {
         return;
     }
 
-    var endTime = new Date();
-    endTime.setTime(this.game.turnStartedTime+Config.turnLength*60*1000);
+    var endTime = this.game.turnStartedTime+Config.turnLength*60*1000;
+
+    var warningTime = endTime - 1*60*1000;
+
+    if ( Date.now() >= warningTime && this.game.turnLastWarningTime < warningTime) {
+        var msg = "10 minutes remaining!";
+        this.gameBot.say({channel:this.channelId, text:msg});
+        this.game.turnLastWarningTime = Date.now();
+        this._saveGame();
+    }
 
     if ( Date.now() >= endTime ) {
         this._endTurn();
@@ -140,7 +148,7 @@ GameController.prototype._startGame = function() {
     this.game.status = Game.statuses.running;
 
     // create targets
-    var targetCount = Math.round(this.game.players.length * Config.targets.countPerPlayer);
+    var targetCount = Math.ceil(this.game.players.length * Config.targets.countPerPlayer);
     for ( var i=0; i<targetCount; i++ ) {
         var target = Target.create(i.toString(), Config.targets.names[i]);
         this.game.targets.push(target);
@@ -148,10 +156,11 @@ GameController.prototype._startGame = function() {
 
     // assign bounties
     this.game.players.forEach(function(player){
+        var targets = _.shuffle(this.game.targets);
         for ( var i=0; i<Config.turns; i++ ) {
             var value = Config.bounties.values[i];
             var type = Bounty.types.attack;
-            var target = _(this.game.targets).sample().id;
+            var target = targets.pop().id;
             var health = Config.bounties.healths[i];
             var bounty = Bounty.create(i, value, type, target, health);
             player.bounties.push(bounty);
@@ -204,6 +213,7 @@ GameController.prototype._endGame = function() {
 
 GameController.prototype._startTurn = function() {
     this.game.turnStartedTime = Date.now();
+    this.game.turnLastWarningTime = Date.now();
 
     // clear moves
     this.game.players.forEach(function(player){
@@ -558,7 +568,7 @@ GameController.prototype._reportBounties = function(playerId, message) {
     player.bounties.forEach(function(/*Bounty*/ bounty){
         var target = this.game.findTargetById(bounty.target);
         if ( bounty.type == Bounty.types.attack ) {
-            msg += sprintf("- Reduce %s to %s health. DEADLINE: End of turn %s. REWARD: %s credits.\n", target.name, bounty.health, bounty.turn, bounty.value);
+            msg += sprintf("- Reduce %s to %s health. DEADLINE: End of turn %s. REWARD: %s credits.\n", target.name, bounty.health, bounty.turn+1, bounty.value);
         }
     }.bind(this));
     this.commandBot.replyPrivate(message, msg);

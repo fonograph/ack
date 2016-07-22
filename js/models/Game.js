@@ -10,6 +10,7 @@ function Game(teamId, teamData) {
     this.status = teamData.status || Game.statuses.waiting;
     this.turn = teamData.turn;
     this.turnStartedTime = teamData.turnStartedTime;
+    this.turnLastWarningTime = teamData.turnLastWarningTime;
 }
 
 Game.statuses = {
