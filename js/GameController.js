@@ -75,15 +75,6 @@ GameController.prototype.handlePlayerAction = function(playerId, text, message) 
             this._startGame();
             this._saveGame();
         }
-        else if ( text == 'killit' ) {
-            this._endGame();
-            this._saveGame();
-            this.commandBot.replyPrivate(message, 'Forced end of game');
-        }
-        else if ( text == 'forceit' ) {
-            this._endTurn();
-            this._saveGame();
-        }
         else if ( text == 'reset' ) {
             this._resetQueuedMoves(playerId, message);
             this._saveGame();
@@ -106,6 +97,19 @@ GameController.prototype.handlePlayerAction = function(playerId, text, message) 
         else if ( _(Move.names).includes(text[0]) ) {
             this._queueMove(playerId, text, message);
             this._saveGame();
+        }
+        // DEBUG STUFF
+        else if ( text == 'killit' ) {
+            this._endGame();
+            this._saveGame();
+            this.commandBot.replyPrivate(message, 'Forced end of game');
+        }
+        else if ( text == 'forceit' ) {
+            this._endTurn();
+            this._saveGame();
+        }
+        else if ( text == 'repeatstart' ) {
+            this._startTurnOutput();
         }
         else {
             this.commandBot.replyPrivate(message, 'That command was not recognized.');
@@ -228,6 +232,10 @@ GameController.prototype._startTurn = function() {
         target.currentSecretValue = Math.round( 100 * ((Config.targets.secretValueMax-Config.targets.secretValueMin) * secretValueWeight + Config.targets.secretValueMin)) / 100;
     });
 
+    this._startTurnOutput();
+};
+
+GameController.prototype._startTurnOutput = function() {
     // announce
     var endTime = new Date();
     endTime.setTime(this.game.turnStartedTime+Config.turnLength*60*1000);
