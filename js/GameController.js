@@ -123,7 +123,7 @@ GameController.prototype.handleTimePassage = function() {
 
     var endTime = this.game.turnStartedTime+Config.turnLength*60*1000;
 
-    var warningTime = endTime - 1*60*1000;
+    var warningTime = endTime - 10*60*1000;
 
     if ( Date.now() >= warningTime && this.game.turnLastWarningTime < warningTime) {
         var msg = "10 minutes remaining!";
