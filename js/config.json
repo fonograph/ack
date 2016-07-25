@@ -1,6 +1,6 @@
 {
   "turns": 5,
-  "turnLength": 60,
+  "turnLength": 720,
   "movesPerTurn": 5,
   "startingPoints": 30,
   "targets": {
